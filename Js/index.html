@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>3 kółka</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <!--
+    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+    <script src='main.js'></script>
+    -->
+    <script>
+        function start() {
+            document.track = [];
+            document.circles = [
+                {
+                    radius: 180,
+                    angle: 45,
+                    speed: -2.05
+                },
+                {
+                    radius: 90,
+                    angle: 45,
+                    speed: 1
+                },
+                {
+                    radius: 45,
+                    angle: 45,
+                    speed: -3
+                }
+            ]
+            document.startTime = 0;
+            //draw();
+            var interval = setInterval(draw, 100);
+        }
+        function drawCircle(ctx, x, y, r, fillColor, stroke) {
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, 2 * Math.PI);
+            // console.log(fillColor);
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+            if (stroke)
+                ctx.stroke();
+        }
+        function decimalToHex(d, padding) {
+            var hex = Number(d).toString(16);
+            padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+
+            while (hex.length < padding) {
+                hex = "0" + hex;
+            }
+
+            return hex;
+        }
+        function draw() {
+            const el = document.getElementById("canvas");
+            const ctx = el.getContext("2d");
+            el.width = 1000;
+            el.height = 750;
+            // document.startTime += 0.2;
+            ctx.globalAlpha = 1;
+            ctx.lineWidth = 2;
+
+            let x = el.width * 0.5;
+            let y = el.height * 0.5;
+
+            ctx.clearRect(0, 0, el.width, el.height);
+
+            const circles = document.circles;
+            const degToRad = Math.PI / 180;
+            let angleSum = 0;
+            for(let key in document.circles) {
+                const circle = circles[key];
+                circle.angle += circle.speed*1.2;
+
+                drawCircle(ctx, x, y, 2, "blue", true);
+
+                ctx.beginPath();
+                ctx.arc(x, y, circle.radius, 0, 2 * Math.PI);
+                ctx.strokeStyle = "black";
+                ctx.stroke();
+
+                angleSum += circle.angle;
+                x += circle.radius * Math.cos(angleSum * degToRad);
+                y -= circle.radius * Math.sin(angleSum * degToRad);
+            }           
+
+            var track = document.track;
+            idx = 0;
+            let alpha = 100;
+            let previous = undefined;
+            track.unshift({x: x, y: y});
+            if (track.length>400)
+                track.pop();
+            for(const key in track)
+            {
+                idx ++ ;
+                const point = track[key];                 
+               ctx.globalAlpha = alpha/100;
+               ctx.lineWidth = 1 + 3 * alpha/100;
+               alpha-= 0.25;
+               if (alpha<0)
+                break;
+               if(previous !== undefined) {
+                ctx.beginPath();
+                ctx.moveTo(previous.x, previous.y);
+                ctx.lineTo(point.x, point.y);
+
+                // Draw the Path
+                ctx.strokeStyle = "red";
+                ctx.stroke();
+               }
+               previous = point;
+            }
+          
+            ctx.globalAlpha = 1;
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "black";
+            drawCircle(ctx, x, y, 8, "red", true);
+        }
+    </script>
+    <style>
+        body {
+            margin: 0px;    
+        }            
+        .content {
+            height: 100dvh;    
+            margin: 0px;    
+        }
+        #canvas {
+            background-color: aquamarine;
+            width: 1000px;    
+            height: 750px;
+            border-color: red;
+        }
+        h1 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-top: 0;
+        }
+    
+    </style>
+</head>
+<body onload="start();"></body>
+    <div class="content">
+        <h1>3 kółka</h1>
+        <canvas id="canvas"></canvas>
+    </div>
+</body>
+</html>
